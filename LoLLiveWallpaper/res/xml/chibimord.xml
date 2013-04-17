@@ -1,0 +1,43 @@
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    <item android:drawable="@drawable/chibimord_frame0" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame1" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame2" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame3" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame4" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame5" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame6" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame7" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame8" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame9" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame10" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame11" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame12" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame13" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame14" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame15" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame16" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame17" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame18" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame19" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame20" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame21" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame22" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame23" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame24" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame25" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame26" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame27" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame28" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame29" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame30" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame31" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame32" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame33" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame34" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame35" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame36" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame37" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame38" android:duration="1" />
+    <item android:drawable="@drawable/chibimord_frame39" android:duration="1" />
+</animation-list>
