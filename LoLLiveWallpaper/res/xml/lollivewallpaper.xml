@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wallpaper 
-	android:settingsActivity="de.vogella.android.wallpaper.MyPreferencesActivity"
+	android:settingsActivity="hyoma.app.lollivewallpaper.MyPreferencesActivity"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:description="@string/wallpaper_description" 
 	android:thumbnail="@drawable/ic_launcher" />
