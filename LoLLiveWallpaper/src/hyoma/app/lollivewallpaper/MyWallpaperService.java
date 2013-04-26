@@ -2,17 +2,22 @@ package hyoma.app.lollivewallpaper;
 
 
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
+import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.view.WindowManager;
 import hyoma.app.lollivewallpaper.SetWallpaperActivity;
 public class MyWallpaperService extends WallpaperService {
 
@@ -22,8 +27,7 @@ public class MyWallpaperService extends WallpaperService {
 	}
 
 	private class MyWallpaperEngine extends Engine { 
-		float lastX = SetWallpaperActivity.Measuredwidth/2;
-		float lastY = SetWallpaperActivity.Measuredheight/2;
+		// private variables
 		private int animationCount = 0;
 		private final Handler handler = new Handler();
 		private final Runnable drawRunner = new Runnable() {
@@ -36,6 +40,7 @@ public class MyWallpaperService extends WallpaperService {
 		private boolean visible = true;
 		private boolean touchEnabled;
 
+		// Constructor
 		public MyWallpaperEngine() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MyWallpaperService.this);
 			touchEnabled = prefs.getBoolean("touch", true);
@@ -73,8 +78,8 @@ public class MyWallpaperService extends WallpaperService {
 		// Called immediately after any structural change. Always called at least once after creation.
 		@Override
 		public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-			this.lastX = width;
-			this.lastY = height;
+			SetWallpaperActivity.setWidth(width);
+			SetWallpaperActivity.setHeight(height);
 			super.onSurfaceChanged(holder, format, width, height);
 		}
 
@@ -83,10 +88,11 @@ public class MyWallpaperService extends WallpaperService {
 		// so if it is slow you will get fewer move events.
 		@Override
 		public void onTouchEvent(MotionEvent event) {
-			if (touchEnabled) {
+			// Allows touch events to occur only if it is enabled in the prefs and is in preview mode. 
+			if (touchEnabled && this.isPreview()) {
 
-				lastX = event.getX();
-				lastY = event.getY();
+				SetWallpaperActivity.setWidth(event.getX());
+				SetWallpaperActivity.setHeight(event.getY());
 				SurfaceHolder holder = getSurfaceHolder();
 				Canvas canvas = null;
 				
@@ -108,7 +114,7 @@ public class MyWallpaperService extends WallpaperService {
 						canvas = holder.lockCanvas();
 						if (canvas != null) {
 							canvas.drawColor(Color.BLACK);
-							canvas.drawBitmap(img,lastX,lastY, null);
+							canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
 						}
 					} finally {
 						if (canvas != null)
@@ -144,7 +150,7 @@ public class MyWallpaperService extends WallpaperService {
 					canvas = holder.lockCanvas();
 					if (canvas != null) {
 						canvas.drawColor(Color.BLACK);
-						canvas.drawBitmap(img,lastX,lastY, null);
+						canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
 					}
 				} finally {
 					if (canvas != null)
