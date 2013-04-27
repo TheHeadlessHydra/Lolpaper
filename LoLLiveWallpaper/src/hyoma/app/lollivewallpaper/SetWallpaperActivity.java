@@ -17,6 +17,8 @@ public class SetWallpaperActivity extends Activity {
 	// I am storing the height/width values into it so that, in the preview, the user can choose where
 	// to place the image, and the once the preview dies and the real wallpaper is being set, the values chosen
 	// in the preview remain and gets placed there. 
+	static float Totalwidth = 0;
+	static float Totalheight = 0;
 	static float Measuredwidth = 0;
 	static float Measuredheight = 0;
 	
@@ -33,6 +35,19 @@ public class SetWallpaperActivity extends Activity {
 		return Measuredheight;
 	}
 	
+	static public void setTotalWidth(float x){
+		Totalwidth = x;
+	}
+	static public void setTotalHeight(float y){
+		Totalheight = y;
+	}
+	static public float getTotalWidth(){
+		return Totalwidth;
+	}
+	static public float getTotalHeight(){
+		return Totalheight;
+	}
+	
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -45,12 +60,16 @@ public class SetWallpaperActivity extends Activity {
 	    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2){
           w.getDefaultDisplay().getSize(size);
 
-          Measuredwidth = size.x;
-          Measuredheight = size.y; 
+          setWidth(size.x/2);
+          setHeight(size.y/2);
+          setTotalWidth(size.x);
+          setTotalHeight(size.y);
         }else{
           Display d = w.getDefaultDisplay(); 
-          Measuredwidth = d.getWidth(); 
-          Measuredheight = d.getHeight(); 
+          setWidth(d.getWidth()/2); 
+          setHeight(d.getHeight()/2); 
+          setTotalWidth(d.getWidth());
+          setTotalHeight(d.getHeight());
         }		
 		// ------------------------------------
 	    

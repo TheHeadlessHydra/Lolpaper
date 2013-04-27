@@ -2,22 +2,17 @@ package hyoma.app.lollivewallpaper;
 
 
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
-import android.os.Build;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.view.WindowManager;
 import hyoma.app.lollivewallpaper.SetWallpaperActivity;
 public class MyWallpaperService extends WallpaperService {
 
@@ -78,21 +73,30 @@ public class MyWallpaperService extends WallpaperService {
 		// Called immediately after any structural change. Always called at least once after creation.
 		@Override
 		public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-			SetWallpaperActivity.setWidth(width);
-			SetWallpaperActivity.setHeight(height);
+			//SetWallpaperActivity.setWidth(width);
+			//SetWallpaperActivity.setHeight(height);
 			super.onSurfaceChanged(holder, format, width, height);
 		}
-
+	
 		// Called as the user performs touch-screen interaction with the window that is currently showing this wallpaper. 
 		// Note that the events you receive here are driven by the actual application the user is interacting with, 
 		// so if it is slow you will get fewer move events.
 		@Override
 		public void onTouchEvent(MotionEvent event) {
-			// Allows touch events to occur only if it is enabled in the prefs and is in preview mode. 
-			if (touchEnabled && this.isPreview()) {
+			float fTouchX = event.getX();
+			float fTouchY = event.getY();
+			float fTotalHeight = SetWallpaperActivity.getTotalHeight();
+			float fTotalWidth = SetWallpaperActivity.getTotalWidth();
+			
+			// Allows touch events to occur only if it is enabled in the prefs and is in preview mode, 
+			// and the touch event is in the right area.
+			if (	fTouchY < (fTotalHeight - fTotalHeight/6) && // Above a distance to not hit bottom edge
+					fTouchY > 0                 			  && // Do not go too high, or cut off top of image
+					fTouchX < (fTotalWidth - fTotalWidth/6)   && // Do not go too far right, or cut off image
+					touchEnabled && this.isPreview()) {
 
-				SetWallpaperActivity.setWidth(event.getX());
-				SetWallpaperActivity.setHeight(event.getY());
+				SetWallpaperActivity.setWidth(fTouchX);
+				SetWallpaperActivity.setHeight(fTouchY);
 				SurfaceHolder holder = getSurfaceHolder();
 				Canvas canvas = null;
 				
