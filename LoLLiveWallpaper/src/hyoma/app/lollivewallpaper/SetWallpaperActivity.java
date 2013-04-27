@@ -58,7 +58,7 @@ public class SetWallpaperActivity extends Activity {
 		Point size = new Point();
 		WindowManager w = getWindowManager();
 	    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2){
-          w.getDefaultDisplay().getSize(size);
+	      w.getDefaultDisplay().getSize(size);
 
           setWidth(size.x/2);
           setHeight(size.y/2);
@@ -77,13 +77,17 @@ public class SetWallpaperActivity extends Activity {
 		setContentView(R.layout.main); // the main.xml in res/layout/ is what will set any menu/buttons on start of app.
 	}
 
-	public void onButton1Click(View view) {
+	public void oncChibiMordClick(View view) {
 		// This is called when button is clicked. It does all the work of creating the background. 
 		Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
 		intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, MyWallpaperService.class));
 		startActivity(intent);
 	}
-
-
+	
+	public void onSetBGClick(View view){
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_SET_WALLPAPER);
+		startActivity(intent);
+	}
 
 }

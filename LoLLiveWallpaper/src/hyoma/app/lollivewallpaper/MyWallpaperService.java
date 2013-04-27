@@ -2,6 +2,8 @@ package hyoma.app.lollivewallpaper;
 
 
 
+import android.app.WallpaperManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -153,6 +155,11 @@ public class MyWallpaperService extends WallpaperService {
 					// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
 					canvas = holder.lockCanvas();
 					if (canvas != null) {
+						//Intent intent = new Intent();
+						//intent.setAction(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER);
+						//startActivity(intent);
+						//Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
+						//startActivity(Intent.createChooser(intent, "Select Wallpaper"));
 						canvas.drawColor(Color.BLACK);
 						canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
 					}
