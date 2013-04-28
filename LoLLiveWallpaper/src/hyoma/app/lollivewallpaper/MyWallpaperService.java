@@ -3,7 +3,6 @@ package hyoma.app.lollivewallpaper;
 
 
 import android.app.WallpaperManager;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -19,10 +18,11 @@ import android.service.wallpaper.WallpaperService;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import hyoma.app.lollivewallpaper.SetWallpaperActivity;
+
 public class MyWallpaperService extends WallpaperService {
-	Bitmap wallpaperBG;
-	WallpaperManager wallpaperManager;
-	Drawable wallpaperDrawable;
+	Bitmap wallpaperBG; // Holds current bg wallpaper
+	WallpaperManager wallpaperManager; // Holds current wallpaper manager
+	Drawable wallpaperDrawable; // holds current wallpaper drawable 
 	
 	@Override
 	public Engine onCreateEngine() {
@@ -111,42 +111,55 @@ public class MyWallpaperService extends WallpaperService {
 			float fTotalHeight = SetWallpaperActivity.getTotalHeight();
 			float fTotalWidth = SetWallpaperActivity.getTotalWidth();
 			
-			// Allows touch events to occur only if it is enabled in the prefs and is in preview mode, 
+			// Obtain the animation bitmap
+			String animFrame = "chibimord_frame" + animationCount; 
+			animationCount++;
+			if(animationCount > 39){
+				animationCount = 0;
+			}
+			BitmapFactory bm = new BitmapFactory(); 
+			int identifier = 0;
+			identifier = getResources().getIdentifier(animFrame,"drawable", "hyoma.app.lollivewallpaper");
+			if (identifier == 0){
+				super.onTouchEvent(event);
+				return;
+			}
+			Bitmap img = bm.decodeResource(getResources(), identifier);
+			
+			//Reallocate the touch position to be the centre of the image
+			float fXSize = img.getWidth();
+			float fYSize = img.getHeight();
+			float fPositionX = fTouchX - (fXSize/2);
+			float fPositionY = fTouchY - (fYSize/2);
+			
+			// Allow touch events to occur only if it is enabled in the prefs and is in preview mode, 
 			// and the touch event is in the right area.
-			if (	fTouchY < (fTotalHeight - fTotalHeight/6) && // Above a distance to not hit bottom edge
-					fTouchY > 0                 			  && // Do not go too high, or cut off top of image
-					fTouchX < (fTotalWidth - fTotalWidth/6)   && // Do not go too far right, or cut off image
+			if (	fPositionY < (fTotalHeight - fTotalHeight/6) && // Do not go too low, so as not to touch the buttons at the bottom
+					fPositionY > 0                 			  && // Do not go too high, or cut off top of image
+					fPositionX < (fTotalWidth - fTotalWidth/6)   && // Do not go too far right, or cut off image
 					touchEnabled && this.isPreview()) {
 
-				SetWallpaperActivity.setWidth(fTouchX);
-				SetWallpaperActivity.setHeight(fTouchY);
+				// Set the position of the touch in the static holders
+				SetWallpaperActivity.setWidth(fPositionX);
+				SetWallpaperActivity.setHeight(fPositionY);
+				
 				SurfaceHolder holder = getSurfaceHolder();
 				Canvas canvas = null;
-				
-				BitmapFactory bm = new BitmapFactory(); 
-				String animFrame = "chibimord_frame" + animationCount; 
-				animationCount++;
-				if(animationCount > 39){
-					animationCount = 0;
-				}
-				int identifier = 0;
-				identifier = getResources().getIdentifier(animFrame,"drawable", "hyoma.app.lollivewallpaper");
-				if(identifier != 0){
-					Bitmap img = bm.decodeResource(getResources(), identifier);  					  	
-					try {
-						// lockCanvas():
-						// Start editing the pixels in the surface. The returned Canvas can be used to draw into the surface's bitmap. 
-						// A null is returned if the surface has not been created or otherwise cannot be edited. 
-						// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
-						canvas = holder.lockCanvas();
-						if (canvas != null) {
-							canvas.drawBitmap(wallpaperBG, -256, 0, null); // I dont know why it needs to be -256 for it to work.
-							canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
-						}
-					} finally {
-						if (canvas != null)
-							holder.unlockCanvasAndPost(canvas);
+									  	
+				try {
+					// lockCanvas():
+					// Start editing the pixels in the surface. The returned Canvas can be used to draw into the surface's bitmap. 
+					// A null is returned if the surface has not been created or otherwise cannot be edited. 
+					// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
+					canvas = holder.lockCanvas();
+					if (canvas != null) {
+						// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
+						canvas.drawBitmap(wallpaperBG, -256, 0, null); // I don't know why it needs to be -256 for it to be aligned properly.
+						canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
 					}
+				} finally {
+					if (canvas != null)
+						holder.unlockCanvasAndPost(canvas);
 				}
 			}
 		super.onTouchEvent(event);
@@ -174,8 +187,9 @@ public class MyWallpaperService extends WallpaperService {
 					// A null is returned if the surface has not been created or otherwise cannot be edited. 
 					// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
 					canvas = holder.lockCanvas();
-					if (canvas != null) {			
-						canvas.drawBitmap(wallpaperBG, -256, 0, null); // I dont know why it needs to be -256 for it to work.
+					if (canvas != null) {	
+						// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
+						canvas.drawBitmap(wallpaperBG, -256, 0, null); // I don't know why it needs to be -256 for it to be aligned properly.
 						canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
 						
 						// store the location of where the animation is in a preference so that the next time 
