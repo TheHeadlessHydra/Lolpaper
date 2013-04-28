@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,14 @@ import android.view.View;
 import android.view.WindowManager;
 
 public class SetWallpaperActivity extends Activity {
+	// ----- Preferences ------------------------------
+	// Preference files
+	public static final String locationPref = "location";
+	// Preference keys for locationPref
+	public static final String X = "x";
+	public static final String Y = "y";
+	// ------------------------------------------------
+	
 	// I am assuming that this class remains alive for the duration of the live wallpapers lifecycle.
 	// I am storing the height/width values into it so that, in the preview, the user can choose where
 	// to place the image, and the once the preview dies and the real wallpaper is being set, the values chosen
@@ -21,7 +30,7 @@ public class SetWallpaperActivity extends Activity {
 	static float Totalheight = 0;
 	static float Measuredwidth = 0;
 	static float Measuredheight = 0;
-	
+
 	static public void setWidth(float x){
 		Measuredwidth = x;
 	}
@@ -50,8 +59,7 @@ public class SetWallpaperActivity extends Activity {
 	
 	@SuppressLint("NewApi")
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		
+	protected void onCreate(Bundle savedInstanceState) {		
 		// ------------------------------------
 		// Find the size of the screen here. Allow for both before and after version 13 changes by using
 		// depricated functions. 
@@ -73,21 +81,29 @@ public class SetWallpaperActivity extends Activity {
         }		
 		// ------------------------------------
 	    
+	    // If the location of the animation was created earlier, preserve it. 
+	    SharedPreferences prefs = getApplicationContext().getSharedPreferences("location", 0);
+		if(prefs.contains(X) && prefs.contains(Y)){
+			setWidth( prefs.getFloat(X,0) );
+			setHeight( prefs.getFloat(Y,0) );
+		}
+		
+		
 		super.onCreate(savedInstanceState); // This activity itself creates the light grey atmosphere. Must be a property of the activity theme. 
 		setContentView(R.layout.main); // the main.xml in res/layout/ is what will set any menu/buttons on start of app.
 	}
 
 	public void oncChibiMordClick(View view) {
 		// This is called when button is clicked. It does all the work of creating the background. 
-		Intent intent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-		intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, MyWallpaperService.class));
-		startActivity(intent);
+		Intent mordIntent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+		mordIntent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, MyWallpaperService.class));
+		startActivity(mordIntent);
 	}
 	
 	public void onSetBGClick(View view){
-		Intent intent = new Intent();
-		intent.setAction(Intent.ACTION_SET_WALLPAPER);
-		startActivity(intent);
+		Intent BGintent = new Intent();
+		BGintent.setAction(Intent.ACTION_SET_WALLPAPER);
+		startActivity(BGintent);
 	}
 
 }

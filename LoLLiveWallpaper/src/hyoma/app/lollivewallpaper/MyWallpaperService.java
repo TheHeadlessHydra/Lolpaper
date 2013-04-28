@@ -177,6 +177,14 @@ public class MyWallpaperService extends WallpaperService {
 					if (canvas != null) {			
 						canvas.drawBitmap(wallpaperBG, -256, 0, null); // I dont know why it needs to be -256 for it to work.
 						canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
+						
+						// store the location of where the animation is in a preference so that the next time 
+						// the app is launched, the location does not change. 
+						SharedPreferences prefs = getApplicationContext().getSharedPreferences(SetWallpaperActivity.locationPref, 0);
+						SharedPreferences.Editor prefsEditor = prefs.edit();
+						prefsEditor.putFloat(SetWallpaperActivity.X, SetWallpaperActivity.getWidth());
+						prefsEditor.putFloat(SetWallpaperActivity.Y, SetWallpaperActivity.getHeight());
+						prefsEditor.commit();
 					}
 				} finally {
 					if (canvas != null)
