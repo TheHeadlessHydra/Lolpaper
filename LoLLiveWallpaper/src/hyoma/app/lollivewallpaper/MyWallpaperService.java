@@ -6,10 +6,13 @@ import android.app.WallpaperManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
@@ -17,13 +20,31 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import hyoma.app.lollivewallpaper.SetWallpaperActivity;
 public class MyWallpaperService extends WallpaperService {
-
+	Bitmap wallpaperBG;
+	WallpaperManager wallpaperManager;
+	Drawable wallpaperDrawable;
+	
 	@Override
 	public Engine onCreateEngine() {
+		// Obtain the current wallpaper background
+		wallpaperManager = WallpaperManager.getInstance(this);
+		wallpaperDrawable = wallpaperManager.getDrawable();
+		if (wallpaperDrawable instanceof BitmapDrawable) {
+			wallpaperBG = ((BitmapDrawable)wallpaperDrawable).getBitmap();
+	    }
+		else{
+			Bitmap bitmap = Bitmap.createBitmap(wallpaperDrawable.getIntrinsicWidth(), wallpaperDrawable.getIntrinsicHeight(), Config.ARGB_8888);
+		    Canvas cv = new Canvas(bitmap); 
+		    wallpaperDrawable.setBounds(0, 0, cv.getWidth(), cv.getHeight());
+		    wallpaperDrawable.draw(cv);
+		    wallpaperBG = bitmap;
+		}
+	    
 		return new MyWallpaperEngine();
 	}
 
 	private class MyWallpaperEngine extends Engine { 
+		
 		// private variables
 		private int animationCount = 0;
 		private final Handler handler = new Handler();
@@ -119,7 +140,7 @@ public class MyWallpaperService extends WallpaperService {
 						// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
 						canvas = holder.lockCanvas();
 						if (canvas != null) {
-							canvas.drawColor(Color.BLACK);
+							canvas.drawBitmap(wallpaperBG, -256, 0, null); // I dont know why it needs to be -256 for it to work.
 							canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
 						}
 					} finally {
@@ -132,8 +153,7 @@ public class MyWallpaperService extends WallpaperService {
 		}
 
 		// The main look of the wallpaper. 
-		private void draw() {
-
+		private void draw() {			
 			// This holder holds the image and allows one to change the pixels. 
 			SurfaceHolder holder = getSurfaceHolder();
 			Canvas canvas = null;
@@ -154,13 +174,8 @@ public class MyWallpaperService extends WallpaperService {
 					// A null is returned if the surface has not been created or otherwise cannot be edited. 
 					// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
 					canvas = holder.lockCanvas();
-					if (canvas != null) {
-						//Intent intent = new Intent();
-						//intent.setAction(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER);
-						//startActivity(intent);
-						//Intent intent = new Intent(Intent.ACTION_SET_WALLPAPER);
-						//startActivity(Intent.createChooser(intent, "Select Wallpaper"));
-						canvas.drawColor(Color.BLACK);
+					if (canvas != null) {			
+						canvas.drawBitmap(wallpaperBG, -256, 0, null); // I dont know why it needs to be -256 for it to work.
 						canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
 					}
 				} finally {
