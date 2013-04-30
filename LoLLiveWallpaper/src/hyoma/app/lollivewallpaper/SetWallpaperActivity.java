@@ -1,19 +1,33 @@
 package hyoma.app.lollivewallpaper;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.Bitmap.Config;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Display;
+import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 public class SetWallpaperActivity extends Activity {
+	// private variables
+	private final int SET_WALLPAPER = 1;
 	// ----- Preferences ------------------------------
 	// Preference files
 	public static final String locationPref = "location";
@@ -61,7 +75,7 @@ public class SetWallpaperActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {		
 		// ------------------------------------
-		// Find the size of the screen here. Allow for both before and after version 13 changes by using
+		// Find the size of the screen here. Allow for both before and after android version 13  by using
 		// depricated functions. 
 		Point size = new Point();
 		WindowManager w = getWindowManager();
@@ -101,9 +115,54 @@ public class SetWallpaperActivity extends Activity {
 	}
 	
 	public void onSetBGClick(View view){
+		// Use startActivityForResult() to notify onActivityResult when the intent is complete
 		Intent BGintent = new Intent();
 		BGintent.setAction(Intent.ACTION_SET_WALLPAPER);
-		startActivity(BGintent);
+		startActivityForResult(BGintent,SET_WALLPAPER);
 	}
+	
+	public void onClearClick(View view){
+		/*
+		Bitmap wallpaperBG; 
+		WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+		Drawable wallpaperDrawable = wallpaperManager.getDrawable();
+		if (wallpaperDrawable instanceof BitmapDrawable) {
+			wallpaperBG = ((BitmapDrawable)wallpaperDrawable).getBitmap();
+	    }
+		else{
+			Bitmap bitmap = Bitmap.createBitmap(wallpaperDrawable.getIntrinsicWidth(), wallpaperDrawable.getIntrinsicHeight(), Config.ARGB_8888);
+		    Canvas cv = new Canvas(bitmap); 
+		    wallpaperDrawable.setBounds(0, 0, cv.getWidth(), cv.getHeight());
+		    wallpaperDrawable.draw(cv);
+		    wallpaperBG = bitmap;
+		}
+		WallpaperManager wpaperM = WallpaperManager.getInstance(getApplicationContext());
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+		wallpaperBG.compress(CompressFormat.PNG, 0 , bos); 
+		byte[] bitmapdata = bos.toByteArray();
+		ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
+		
+		try{
+			wpaperM.setStream(bs);
+		} catch(IOException e){
+			Toast toast = Toast.makeText(getApplicationContext(), "ERROR: Cannot clear", Toast.LENGTH_LONG);
+			toast.show();
+		}
+		*/
+	}
+	
+	// When the onSetBGClick() is complete, call the last animation intent
+	// that was currently active. 
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// if the activity that just finished was a set wallpaper call...
+		if(requestCode == SET_WALLPAPER){
+			Intent mordIntent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+			mordIntent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, MyWallpaperService.class));
+			startActivity(mordIntent);
+		}
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
 }

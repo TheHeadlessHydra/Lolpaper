@@ -17,6 +17,7 @@ import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import android.widget.Toast;
 import hyoma.app.lollivewallpaper.SetWallpaperActivity;
 
 public class MyWallpaperService extends WallpaperService {
@@ -46,7 +47,7 @@ public class MyWallpaperService extends WallpaperService {
 	private class MyWallpaperEngine extends Engine { 
 		
 		// private variables
-		private int animationCount = 0;
+		private final int updateTimer = 20; 
 		private final Handler handler = new Handler();
 		private final Runnable drawRunner = new Runnable() {
 			@Override
@@ -54,22 +55,35 @@ public class MyWallpaperService extends WallpaperService {
 				draw();
 			}
 		};
-		private Paint paint = new Paint();
 		private boolean visible = true;
 		private boolean touchEnabled;
+		private int animationCount = 0;
+		Bitmap animFrame;
 
-		// Constructor
 		public MyWallpaperEngine() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MyWallpaperService.this);
 			touchEnabled = prefs.getBoolean("touch", true);
-			paint.setAntiAlias(true);
-			paint.setColor(Color.WHITE);
-			paint.setStyle(Paint.Style.STROKE);
-			paint.setStrokeJoin(Paint.Join.ROUND);
-			paint.setStrokeWidth(10f);
-			handler.post(drawRunner);
+			handler.post(drawRunner);			
 		}
 
+		// Get the next animation in the frame.
+		private void nextFrame(){
+			// *****************************************************************************************************
+			String nameOfFrame = "chibimord_frame" + animationCount; // HARD CODED STRING - NEEDS TO BE STANDARDIZED
+			animationCount++;
+			if(animationCount > 39){
+				animationCount = 0;
+			}
+			BitmapFactory bm = new BitmapFactory(); 
+			int identifier = 0;
+			identifier = getResources().getIdentifier(nameOfFrame,"drawable", "hyoma.app.lollivewallpaper");
+			if (identifier == 0){
+				String errorMsg = "ERROR: Animation frames missing or corrupted";
+				throw new Error(errorMsg);
+			}
+			animFrame = bm.decodeResource(getResources(), identifier);
+		}
+		
 		// Called to inform you of the wallpaper becoming visible or hidden. 
 		// It is very important that a wallpaper only use CPU while it is visible..
 		@Override
@@ -111,24 +125,11 @@ public class MyWallpaperService extends WallpaperService {
 			float fTotalHeight = SetWallpaperActivity.getTotalHeight();
 			float fTotalWidth = SetWallpaperActivity.getTotalWidth();
 			
-			// Obtain the animation bitmap
-			String animFrame = "chibimord_frame" + animationCount; 
-			animationCount++;
-			if(animationCount > 39){
-				animationCount = 0;
-			}
-			BitmapFactory bm = new BitmapFactory(); 
-			int identifier = 0;
-			identifier = getResources().getIdentifier(animFrame,"drawable", "hyoma.app.lollivewallpaper");
-			if (identifier == 0){
-				super.onTouchEvent(event);
-				return;
-			}
-			Bitmap img = bm.decodeResource(getResources(), identifier);
+			nextFrame();
 			
 			//Reallocate the touch position to be the centre of the image
-			float fXSize = img.getWidth();
-			float fYSize = img.getHeight();
+			float fXSize = animFrame.getWidth();
+			float fYSize = animFrame.getHeight();
 			float fPositionX = fTouchX - (fXSize/2);
 			float fPositionY = fTouchY - (fYSize/2);
 			
@@ -155,7 +156,7 @@ public class MyWallpaperService extends WallpaperService {
 					if (canvas != null) {
 						// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
 						canvas.drawBitmap(wallpaperBG, -256, 0, null); // I don't know why it needs to be -256 for it to be aligned properly.
-						canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
+						canvas.drawBitmap(animFrame, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
 					}
 				} finally {
 					if (canvas != null)
@@ -165,49 +166,40 @@ public class MyWallpaperService extends WallpaperService {
 		super.onTouchEvent(event);
 		}
 
-		// The main look of the wallpaper. 
+		// Called constantly to redraw the next animation. 
 		private void draw() {			
 			// This holder holds the image and allows one to change the pixels. 
 			SurfaceHolder holder = getSurfaceHolder();
 			Canvas canvas = null;
 			
-			BitmapFactory bm = new BitmapFactory(); 
-			String animFrame = "chibimord_frame" + animationCount; 
-			animationCount++;
-			if(animationCount > 39){
-				animationCount = 0;
-			}
-			int identifier = 0;
-			identifier = getResources().getIdentifier(animFrame,"drawable", "hyoma.app.lollivewallpaper");
-			if(identifier != 0){
-				Bitmap img = bm.decodeResource(getResources(), identifier);				  
-				try {
-					// lockCanvas():
-					// Start editing the pixels in the surface. The returned Canvas can be used to draw into the surface's bitmap. 
-					// A null is returned if the surface has not been created or otherwise cannot be edited. 
-					// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
-					canvas = holder.lockCanvas();
-					if (canvas != null) {	
-						// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
-						canvas.drawBitmap(wallpaperBG, -256, 0, null); // I don't know why it needs to be -256 for it to be aligned properly.
-						canvas.drawBitmap(img, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
-						
-						// store the location of where the animation is in a preference so that the next time 
-						// the app is launched, the location does not change. 
-						SharedPreferences prefs = getApplicationContext().getSharedPreferences(SetWallpaperActivity.locationPref, 0);
-						SharedPreferences.Editor prefsEditor = prefs.edit();
-						prefsEditor.putFloat(SetWallpaperActivity.X, SetWallpaperActivity.getWidth());
-						prefsEditor.putFloat(SetWallpaperActivity.Y, SetWallpaperActivity.getHeight());
-						prefsEditor.commit();
-					}
-				} finally {
-					if (canvas != null)
-						holder.unlockCanvasAndPost(canvas);
+			nextFrame();
+			
+			try {
+				// lockCanvas():
+				// Start editing the pixels in the surface. The returned Canvas can be used to draw into the surface's bitmap. 
+				// A null is returned if the surface has not been created or otherwise cannot be edited. 
+				// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
+				canvas = holder.lockCanvas();
+				if (canvas != null) {	
+					// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
+					canvas.drawBitmap(wallpaperBG, -256, 0, null); // I don't know why it needs to be -256 for it to be aligned properly.
+					canvas.drawBitmap(animFrame, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
+					
+					// store the location of where the animation is in a preference so that the next time 
+					// the app is launched, the location does not change. 
+					SharedPreferences prefs = getApplicationContext().getSharedPreferences(SetWallpaperActivity.locationPref, 0);
+					SharedPreferences.Editor prefsEditor = prefs.edit();
+					prefsEditor.putFloat(SetWallpaperActivity.X, SetWallpaperActivity.getWidth());
+					prefsEditor.putFloat(SetWallpaperActivity.Y, SetWallpaperActivity.getHeight());
+					prefsEditor.commit();
 				}
+			} finally {
+				if (canvas != null)
+					holder.unlockCanvasAndPost(canvas);
 			}
 			handler.removeCallbacks(drawRunner);
 			if (visible) {
-				handler.postDelayed(drawRunner, 20);
+				handler.postDelayed(drawRunner, updateTimer);
 			}
 		}
 	}
