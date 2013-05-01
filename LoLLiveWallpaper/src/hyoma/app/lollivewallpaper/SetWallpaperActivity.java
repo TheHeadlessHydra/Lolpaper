@@ -122,9 +122,8 @@ public class SetWallpaperActivity extends Activity {
 	}
 	
 	public void onClearClick(View view){
-		/*
 		Bitmap wallpaperBG; 
-		WallpaperManager wallpaperManager = WallpaperManager.getInstance(this);
+		WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
 		Drawable wallpaperDrawable = wallpaperManager.getDrawable();
 		if (wallpaperDrawable instanceof BitmapDrawable) {
 			wallpaperBG = ((BitmapDrawable)wallpaperDrawable).getBitmap();
@@ -136,24 +135,27 @@ public class SetWallpaperActivity extends Activity {
 		    wallpaperDrawable.draw(cv);
 		    wallpaperBG = bitmap;
 		}
-		WallpaperManager wpaperM = WallpaperManager.getInstance(getApplicationContext());
-		
+		// HACK!!--!!--!! THIS MAY NOT WORK ON ALL DEVICES OR VERSIONS
+		// Create an empty byte output stream, put it into an input stream, then use that to setStream()
+		// For whatever reason, this resets the wallpaper to exactly how it should be, and fast.
+		// The proper method of putting the actual image in takes waaaay too long to compress,
+		// which is why it is commented out. This may not work as intended, but there might be a way
+		// to manually reset the wallpaper the same way setStream() seems to be doing it. Without a hack.
+		// Needs further investigation...
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-		wallpaperBG.compress(CompressFormat.PNG, 0 , bos); 
+		//wallpaperBG.compress(CompressFormat.PNG, 100, bos); 
 		byte[] bitmapdata = bos.toByteArray();
 		ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
 		
 		try{
-			wpaperM.setStream(bs);
+			wallpaperManager.setStream(bs);
 		} catch(IOException e){
 			Toast toast = Toast.makeText(getApplicationContext(), "ERROR: Cannot clear", Toast.LENGTH_LONG);
 			toast.show();
 		}
-		*/
 	}
 	
-	// When the onSetBGClick() is complete, call the last animation intent
-	// that was currently active. 
+	// When the onSetBGClick() is complete, call the last animation intent that was currently active. 
 	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// if the activity that just finished was a set wallpaper call...

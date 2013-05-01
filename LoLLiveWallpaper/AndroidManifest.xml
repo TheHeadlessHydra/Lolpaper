@@ -49,5 +49,7 @@
             </intent-filter>
         </activity>
     </application>
+    <!-- Give permission to change the wallpaper -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
 </manifest>
