@@ -62,9 +62,8 @@ public final class R {
         public static final int main=0x7f030000;
     }
     public static final class string {
-        public static final int app_name=0x7f050001;
-        public static final int hello=0x7f050000;
-        public static final int wallpaper_description=0x7f050002;
+        public static final int app_name=0x7f050000;
+        public static final int wallpaper_description=0x7f050001;
     }
     public static final class style {
         /** 
@@ -98,5 +97,6 @@ public final class R {
         public static final int chibimord=0x7f040000;
         public static final int lollivewallpaper=0x7f040001;
         public static final int lollivewallpaper_settings=0x7f040002;
+        public static final int preferences=0x7f040003;
     }
 }

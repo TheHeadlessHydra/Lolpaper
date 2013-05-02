@@ -36,7 +36,11 @@
         <activity
             android:name=".MyPreferencesActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Light.WallpaperSettings" >
+            android:theme="@android:style/Theme.Light.WallpaperSettings"
+            android:exported="true">
+            <intent-filter>
+        		<action android:name="android.intent.action.MAIN" />
+    		</intent-filter>
         </activity>
         <!-- Allows for the SetWallpaperActivity UI to appear -->
         <activity
