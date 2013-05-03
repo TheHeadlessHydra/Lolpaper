@@ -96,7 +96,6 @@ public final class R {
     public static final class xml {
         public static final int chibimord=0x7f040000;
         public static final int lollivewallpaper=0x7f040001;
-        public static final int lollivewallpaper_settings=0x7f040002;
-        public static final int preferences=0x7f040003;
+        public static final int preferences=0x7f040002;
     }
 }

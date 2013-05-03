@@ -8,8 +8,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -17,10 +15,9 @@ import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.widget.Toast;
 import hyoma.app.lollivewallpaper.SetWallpaperActivity;
 
-public class MyWallpaperService extends WallpaperService {
+public class LolpaperService extends WallpaperService {
 	Bitmap wallpaperBG; // Holds current bg wallpaper
 	WallpaperManager wallpaperManager; // Holds current wallpaper manager
 	Drawable wallpaperDrawable; // holds current wallpaper drawable 
@@ -41,13 +38,13 @@ public class MyWallpaperService extends WallpaperService {
 		    wallpaperBG = bitmap;
 		}
 	    
-		return new MyWallpaperEngine();
+		return new LolpaperEngine();
 	}
 
-	private class MyWallpaperEngine extends Engine { 
+	private class LolpaperEngine extends Engine { 
 		
 		// private variables
-		private final int updateTimer = 20; 
+		private int updateTimer; 
 		private final Handler handler = new Handler();
 		private final Runnable drawRunner = new Runnable() {
 			@Override
@@ -60,9 +57,9 @@ public class MyWallpaperService extends WallpaperService {
 		private int animationCount = 0;
 		Bitmap animFrame;
 
-		public MyWallpaperEngine() {
-			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MyWallpaperService.this);
-			touchEnabled = prefs.getBoolean("touch", true);
+		public LolpaperEngine() {
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LolpaperService.this);
+			updateTimer = Integer.parseInt(prefs.getString("updatetimer", "20"));
 			handler.post(drawRunner);			
 		}
 
@@ -120,6 +117,9 @@ public class MyWallpaperService extends WallpaperService {
 		// so if it is slow you will get fewer move events.
 		@Override
 		public void onTouchEvent(MotionEvent event) {
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LolpaperService.this);
+			touchEnabled = prefs.getBoolean("touch", true);
+			
 			float fTouchX = event.getX();
 			float fTouchY = event.getY();
 			float fTotalHeight = SetWallpaperActivity.getTotalHeight();
@@ -167,7 +167,10 @@ public class MyWallpaperService extends WallpaperService {
 		}
 
 		// Called constantly to redraw the next animation. 
-		private void draw() {			
+		private void draw() {		
+			SharedPreferences defPrefs = PreferenceManager.getDefaultSharedPreferences(LolpaperService.this);
+			updateTimer = Integer.parseInt(defPrefs.getString("updatetimer", "20"));
+			
 			// This holder holds the image and allows one to change the pixels. 
 			SurfaceHolder holder = getSurfaceHolder();
 			Canvas canvas = null;

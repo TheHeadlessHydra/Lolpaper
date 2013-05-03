@@ -3,5 +3,5 @@
     android:name="lollivewallpaper"
     android:thumbnail="@drawable/ic_launcher"
     android:description="@string/wallpaper_description"
-    android:settingsActivity="hyoma.app.lollivewallpaper.MyPreferencesActivity">
+    android:settingsActivity="hyoma.app.lollivewallpaper.SettingsActivity">
 </wallpaper>

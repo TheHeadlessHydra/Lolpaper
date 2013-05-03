@@ -110,7 +110,7 @@ public class SetWallpaperActivity extends Activity {
 	public void oncChibiMordClick(View view) {
 		// This is called when button is clicked. It does all the work of creating the background. 
 		Intent mordIntent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-		mordIntent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, MyWallpaperService.class));
+		mordIntent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, LolpaperService.class));
 		startActivity(mordIntent);
 	}
 	
@@ -161,7 +161,7 @@ public class SetWallpaperActivity extends Activity {
 		// if the activity that just finished was a set wallpaper call...
 		if(requestCode == SET_WALLPAPER){
 			Intent mordIntent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-			mordIntent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, MyWallpaperService.class));
+			mordIntent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, LolpaperService.class));
 			startActivity(mordIntent);
 		}
         super.onActivityResult(requestCode, resultCode, data);
