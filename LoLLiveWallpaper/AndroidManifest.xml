@@ -14,7 +14,7 @@
     
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/chibimord_frame0"
         android:label="@string/app_name" >
   
         <!--  The service class that allows long-running background operations -->
@@ -37,7 +37,7 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Light.WallpaperSettings"
+            android:theme="@style/HoloTransparent"
             android:exported="true">
             <intent-filter>
         		<action android:name="android.intent.action.MAIN" />
@@ -45,14 +45,15 @@
         </activity>
         <!-- Set Wallpaper Activity -->
         <activity
-            android:name=".SetWallpaperActivity"
+            android:name=".StartLolpaperActivity"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Light.WallpaperSettings" >
+            android:theme="@style/HoloTransparent" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Grid view activity for the list of available animations -->
     </application>
     <!-- Give permission to change the wallpaper -->
     <uses-permission android:name="android.permission.SET_WALLPAPER" />

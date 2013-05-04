@@ -1,3 +1,11 @@
+// *****************************************************************************
+//***************************
+/*
+This fragment inflates the preferences when the settings button is pressed. 
+*/
+//***************************
+// *****************************************************************************
+
 package hyoma.app.lollivewallpaper;
 
 import android.os.Bundle;

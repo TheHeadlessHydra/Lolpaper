@@ -1,3 +1,11 @@
+// *****************************************************************************
+//***************************
+/*
+This is the main service that handles the live wallpaper engine. 
+*/
+//***************************
+// *****************************************************************************
+
 package hyoma.app.lollivewallpaper;
 
 
@@ -15,7 +23,7 @@ import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import hyoma.app.lollivewallpaper.SetWallpaperActivity;
+import hyoma.app.lollivewallpaper.StartLolpaperActivity;
 
 public class LolpaperService extends WallpaperService {
 	Bitmap wallpaperBG; // Holds current bg wallpaper
@@ -71,14 +79,13 @@ public class LolpaperService extends WallpaperService {
 			if(animationCount > 39){
 				animationCount = 0;
 			}
-			BitmapFactory bm = new BitmapFactory(); 
 			int identifier = 0;
 			identifier = getResources().getIdentifier(nameOfFrame,"drawable", "hyoma.app.lollivewallpaper");
 			if (identifier == 0){
 				String errorMsg = "ERROR: Animation frames missing or corrupted";
 				throw new Error(errorMsg);
 			}
-			animFrame = bm.decodeResource(getResources(), identifier);
+			animFrame = BitmapFactory.decodeResource(getResources(), identifier);
 		}
 		
 		// Called to inform you of the wallpaper becoming visible or hidden. 
@@ -107,8 +114,8 @@ public class LolpaperService extends WallpaperService {
 		// Called immediately after any structural change. Always called at least once after creation.
 		@Override
 		public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-			//SetWallpaperActivity.setWidth(width);
-			//SetWallpaperActivity.setHeight(height);
+			//StartLolpaperActivity.setWidth(width);
+			//StartLolpaperActivity.setHeight(height);
 			super.onSurfaceChanged(holder, format, width, height);
 		}
 	
@@ -122,8 +129,8 @@ public class LolpaperService extends WallpaperService {
 			
 			float fTouchX = event.getX();
 			float fTouchY = event.getY();
-			float fTotalHeight = SetWallpaperActivity.getTotalHeight();
-			float fTotalWidth = SetWallpaperActivity.getTotalWidth();
+			float fTotalHeight = StartLolpaperActivity.getTotalHeight();
+			float fTotalWidth = StartLolpaperActivity.getTotalWidth();
 			
 			nextFrame();
 			
@@ -141,8 +148,8 @@ public class LolpaperService extends WallpaperService {
 					touchEnabled && this.isPreview()) {
 
 				// Set the position of the touch in the static holders
-				SetWallpaperActivity.setWidth(fPositionX);
-				SetWallpaperActivity.setHeight(fPositionY);
+				StartLolpaperActivity.setWidth(fPositionX);
+				StartLolpaperActivity.setHeight(fPositionY);
 				
 				SurfaceHolder holder = getSurfaceHolder();
 				Canvas canvas = null;
@@ -156,7 +163,7 @@ public class LolpaperService extends WallpaperService {
 					if (canvas != null) {
 						// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
 						canvas.drawBitmap(wallpaperBG, -256, 0, null); // I don't know why it needs to be -256 for it to be aligned properly.
-						canvas.drawBitmap(animFrame, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
+						canvas.drawBitmap(animFrame, StartLolpaperActivity.getWidth(), StartLolpaperActivity.getHeight(), null);
 					}
 				} finally {
 					if (canvas != null)
@@ -186,14 +193,14 @@ public class LolpaperService extends WallpaperService {
 				if (canvas != null) {	
 					// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
 					canvas.drawBitmap(wallpaperBG, -256, 0, null); // I don't know why it needs to be -256 for it to be aligned properly.
-					canvas.drawBitmap(animFrame, SetWallpaperActivity.getWidth(), SetWallpaperActivity.getHeight(), null);
+					canvas.drawBitmap(animFrame, StartLolpaperActivity.getWidth(), StartLolpaperActivity.getHeight(), null);
 					
 					// store the location of where the animation is in a preference so that the next time 
 					// the app is launched, the location does not change. 
-					SharedPreferences prefs = getApplicationContext().getSharedPreferences(SetWallpaperActivity.locationPref, 0);
+					SharedPreferences prefs = getApplicationContext().getSharedPreferences(StartLolpaperActivity.locationPref, 0);
 					SharedPreferences.Editor prefsEditor = prefs.edit();
-					prefsEditor.putFloat(SetWallpaperActivity.X, SetWallpaperActivity.getWidth());
-					prefsEditor.putFloat(SetWallpaperActivity.Y, SetWallpaperActivity.getHeight());
+					prefsEditor.putFloat(StartLolpaperActivity.X, StartLolpaperActivity.getWidth());
+					prefsEditor.putFloat(StartLolpaperActivity.Y, StartLolpaperActivity.getHeight());
 					prefsEditor.commit();
 				}
 			} finally {

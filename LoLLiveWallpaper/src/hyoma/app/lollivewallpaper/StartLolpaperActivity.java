@@ -1,4 +1,15 @@
+// *****************************************************************************
+//***************************
+/*
+This is the launcher activity.
+It sets up the main UI and fires the intents that start the live wallpaper . 
+*/
+//***************************
+// *****************************************************************************
+
 package hyoma.app.lollivewallpaper;
+
+import hyoma.app.lollivewallpaper.CreateGridView;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -10,22 +21,15 @@ import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
-import android.graphics.Canvas;
 import android.graphics.Point;
-import android.graphics.Bitmap.Config;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Display;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-public class SetWallpaperActivity extends Activity {
+public class StartLolpaperActivity extends Activity {
 	// private variables
 	private final int SET_WALLPAPER = 1;
 	// ----- Preferences ------------------------------
@@ -71,12 +75,13 @@ public class SetWallpaperActivity extends Activity {
 		return Totalheight;
 	}
 	
+	@SuppressWarnings({ "deprecation", "unused" })
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {		
 		// ------------------------------------
 		// Find the size of the screen here. Allow for both before and after android version 13  by using
-		// depricated functions. 
+		// Deprecated functions. 
 		Point size = new Point();
 		WindowManager w = getWindowManager();
 	    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2){
@@ -102,16 +107,11 @@ public class SetWallpaperActivity extends Activity {
 			setHeight( prefs.getFloat(Y,0) );
 		}
 		
+		// Set the main layout, and create the grid view for the animations. 
+		setContentView(R.layout.main); 
+		CreateGridView gridView = new CreateGridView(this);
 		
-		super.onCreate(savedInstanceState); // This activity itself creates the light grey atmosphere. Must be a property of the activity theme. 
-		setContentView(R.layout.main); // the main.xml in res/layout/ is what will set any menu/buttons on start of app.
-	}
-
-	public void oncChibiMordClick(View view) {
-		// This is called when button is clicked. It does all the work of creating the background. 
-		Intent mordIntent = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
-		mordIntent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(this, LolpaperService.class));
-		startActivity(mordIntent);
+		super.onCreate(savedInstanceState); 
 	}
 	
 	public void onSetBGClick(View view){
@@ -122,19 +122,7 @@ public class SetWallpaperActivity extends Activity {
 	}
 	
 	public void onClearClick(View view){
-		Bitmap wallpaperBG; 
 		WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
-		Drawable wallpaperDrawable = wallpaperManager.getDrawable();
-		if (wallpaperDrawable instanceof BitmapDrawable) {
-			wallpaperBG = ((BitmapDrawable)wallpaperDrawable).getBitmap();
-	    }
-		else{
-			Bitmap bitmap = Bitmap.createBitmap(wallpaperDrawable.getIntrinsicWidth(), wallpaperDrawable.getIntrinsicHeight(), Config.ARGB_8888);
-		    Canvas cv = new Canvas(bitmap); 
-		    wallpaperDrawable.setBounds(0, 0, cv.getWidth(), cv.getHeight());
-		    wallpaperDrawable.draw(cv);
-		    wallpaperBG = bitmap;
-		}
 		// HACK!!--!!--!! THIS MAY NOT WORK ON ALL DEVICES OR VERSIONS
 		// Create an empty byte output stream, put it into an input stream, then use that to setStream()
 		// For whatever reason, this resets the wallpaper to exactly how it should be, and fast.
@@ -143,7 +131,6 @@ public class SetWallpaperActivity extends Activity {
 		// to manually reset the wallpaper the same way setStream() seems to be doing it. Without a hack.
 		// Needs further investigation...
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-		//wallpaperBG.compress(CompressFormat.PNG, 100, bos); 
 		byte[] bitmapdata = bos.toByteArray();
 		ByteArrayInputStream bs = new ByteArrayInputStream(bitmapdata);
 		

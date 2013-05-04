@@ -3,13 +3,11 @@
 
     <PreferenceCategory
             android:title="Touch Services">
-
         <CheckBoxPreference
                 android:key="touch"
                 android:title="Touch Enabled"
                 android:summary="Enable touch during preview" 
                 android:defaultValue="true" />
-        
     </PreferenceCategory>
     
     <PreferenceCategory

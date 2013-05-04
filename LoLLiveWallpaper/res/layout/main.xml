@@ -3,27 +3,45 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:theme="@android:style/Theme.Holo"
     >
-
-    <Button
-        android:id="@+id/chibimord"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mordekaiser"
-        android:onClick="oncChibiMordClick"/>
+    <View
+	  android:layout_width="1dp"
+	  android:layout_height="30dp">
+	</View>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+    	android:layout_height="wrap_content" 
+    	android:orientation="horizontal" 
+    	android:gravity="center" >
+	    <Button
+	        android:id="@+id/setbg"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/choose_background"
+	        android:onClick="onSetBGClick">
+	    </Button>
+	    
+	    <Button
+	        android:id="@+id/clear"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/clear_button"
+	        android:onClick="onClearClick"> 
+        </Button>
+        
+    </LinearLayout>
     
-    <Button
-        android:id="@+id/setbg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Choose Background"
-        android:onClick="onSetBGClick"/>
-    
-    <Button
-        android:id="@+id/clear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Clear"
-        android:onClick="onClearClick"/>
+   <GridView xmlns:android="http://schemas.android.com/apk/res/android" 
+	    android:id="@+id/animationview"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content"
+	    android:columnWidth="90dp"
+	    android:numColumns="auto_fit"
+	    android:verticalSpacing="10dp"
+	    android:horizontalSpacing="10dp"
+	    android:stretchMode="columnWidth"
+	    android:gravity="center">
+    </GridView>
 
 </LinearLayout>
