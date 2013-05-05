@@ -32,6 +32,11 @@ public class LolpaperService extends WallpaperService {
 	
 	@Override
 	public Engine onCreateEngine() {
+		// Call garbage collector to avoid running out of memory!
+		// Constant loading and changing of backgrounds will cause out of memory issues 
+		// since it is happening too fast for the garbage collector to handle it.
+		System.gc();
+		
 		// Obtain the current wallpaper background
 		wallpaperManager = WallpaperManager.getInstance(this);
 		wallpaperDrawable = wallpaperManager.getDrawable();
@@ -114,8 +119,6 @@ public class LolpaperService extends WallpaperService {
 		// Called immediately after any structural change. Always called at least once after creation.
 		@Override
 		public void onSurfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-			//StartLolpaperActivity.setWidth(width);
-			//StartLolpaperActivity.setHeight(height);
 			super.onSurfaceChanged(holder, format, width, height);
 		}
 	
@@ -129,8 +132,13 @@ public class LolpaperService extends WallpaperService {
 			
 			float fTouchX = event.getX();
 			float fTouchY = event.getY();
-			float fTotalHeight = StartLolpaperActivity.getTotalHeight();
-			float fTotalWidth = StartLolpaperActivity.getTotalWidth();
+			float fTotalHeight = prefs.getFloat(StartLolpaperActivity.totalHeight, -1);
+			float fTotalWidth = prefs.getFloat(StartLolpaperActivity.totalWidth, -1);
+			
+			if(fTotalHeight == -1 && fTotalWidth == -1){
+				super.onTouchEvent(event);
+				return;
+			}
 			
 			nextFrame();
 			
@@ -148,12 +156,13 @@ public class LolpaperService extends WallpaperService {
 					touchEnabled && this.isPreview()) {
 
 				// Set the position of the touch in the static holders
-				StartLolpaperActivity.setWidth(fPositionX);
-				StartLolpaperActivity.setHeight(fPositionY);
+				SharedPreferences.Editor prefsEditor = prefs.edit();
+				prefsEditor.putFloat(StartLolpaperActivity.X, fTouchX);
+				prefsEditor.putFloat(StartLolpaperActivity.Y, fTouchY);
+				prefsEditor.commit();
 				
 				SurfaceHolder holder = getSurfaceHolder();
 				Canvas canvas = null;
-									  	
 				try {
 					// lockCanvas():
 					// Start editing the pixels in the surface. The returned Canvas can be used to draw into the surface's bitmap. 
@@ -161,9 +170,15 @@ public class LolpaperService extends WallpaperService {
 					// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
 					canvas = holder.lockCanvas();
 					if (canvas != null) {
+						// Calculate where the wallpaper should be in relation to the screen. Since
+						// homescreens on android affect size of wallpaper, this is the only way
+						// to dynamically find out where to position the wallpaper. 
+						float wallpaperX = wallpaperBG.getWidth();
+						float positionOfWall = (wallpaperX - fTotalWidth)/2;
+						
 						// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
-						canvas.drawBitmap(wallpaperBG, -256, 0, null); // I don't know why it needs to be -256 for it to be aligned properly.
-						canvas.drawBitmap(animFrame, StartLolpaperActivity.getWidth(), StartLolpaperActivity.getHeight(), null);
+						canvas.drawBitmap(wallpaperBG, -positionOfWall, 0, null);
+						canvas.drawBitmap(animFrame, fPositionX, fPositionY, null);
 					}
 				} finally {
 					if (canvas != null)
@@ -184,6 +199,14 @@ public class LolpaperService extends WallpaperService {
 			
 			nextFrame();
 			
+			//Reallocate the touch position to be the centre of the image
+			float fTouchX = defPrefs.getFloat(StartLolpaperActivity.X, -1);
+			float fTouchY = defPrefs.getFloat(StartLolpaperActivity.Y, -1);
+			float fXSize = animFrame.getWidth();
+			float fYSize = animFrame.getHeight();
+			float fPositionX = fTouchX - (fXSize/2);
+			float fPositionY = fTouchY - (fYSize/2);
+			
 			try {
 				// lockCanvas():
 				// Start editing the pixels in the surface. The returned Canvas can be used to draw into the surface's bitmap. 
@@ -191,17 +214,17 @@ public class LolpaperService extends WallpaperService {
 				// You will usually need to implement Callback.surfaceCreated to find out when the Surface is available for use.
 				canvas = holder.lockCanvas();
 				if (canvas != null) {	
-					// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
-					canvas.drawBitmap(wallpaperBG, -256, 0, null); // I don't know why it needs to be -256 for it to be aligned properly.
-					canvas.drawBitmap(animFrame, StartLolpaperActivity.getWidth(), StartLolpaperActivity.getHeight(), null);
+					// Calculate where the wallpaper should be in relation to the screen. Since
+					// homescreens on android affect size of wallpaper, this is the only way
+					// to dynamically find out where to position the wallpaper. 
+					SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LolpaperService.this);
+					float wallpaperX = wallpaperBG.getWidth();
+					float fTotalWidth = prefs.getFloat(StartLolpaperActivity.totalWidth, -1);
+					float positionOfWall = (wallpaperX - fTotalWidth)/2;
 					
-					// store the location of where the animation is in a preference so that the next time 
-					// the app is launched, the location does not change. 
-					SharedPreferences prefs = getApplicationContext().getSharedPreferences(StartLolpaperActivity.locationPref, 0);
-					SharedPreferences.Editor prefsEditor = prefs.edit();
-					prefsEditor.putFloat(StartLolpaperActivity.X, StartLolpaperActivity.getWidth());
-					prefsEditor.putFloat(StartLolpaperActivity.Y, StartLolpaperActivity.getHeight());
-					prefsEditor.commit();
+					// Draw the original wallpaper that was there, then on top of it, draw the animation frame. 
+					canvas.drawBitmap(wallpaperBG, -positionOfWall, 0, null);
+					canvas.drawBitmap(animFrame, fPositionX, fPositionY, null);
 				}
 			} finally {
 				if (canvas != null)

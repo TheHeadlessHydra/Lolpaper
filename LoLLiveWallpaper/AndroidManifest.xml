@@ -11,7 +11,7 @@
         android:name="android.software.live_wallpaper"
         android:required="true" >
     </uses-feature>
-    
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/chibimord_frame0"
@@ -33,6 +33,13 @@
                 android:resource="@xml/lollivewallpaper" >
             </meta-data>
         </service>
+        <!-- Receiver that listens for change in wallpaper -->
+        <receiver
+   			android:name=".WallpaperChangedReciever">
+		   <intent-filter>
+		      <action android:name="android.intent.action.WALLPAPER_CHANGED" />
+		   </intent-filter>
+		</receiver>
 		<!-- Settings Activity -->
         <activity
             android:name=".SettingsActivity"

@@ -24,6 +24,7 @@ import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
@@ -33,79 +34,58 @@ public class StartLolpaperActivity extends Activity {
 	// private variables
 	private final int SET_WALLPAPER = 1;
 	// ----- Preferences ------------------------------
-	// Preference files
-	public static final String locationPref = "location";
-	// Preference keys for locationPref
 	public static final String X = "x";
 	public static final String Y = "y";
+	public static final String TOUCHX = "touchx";
+	public static final String TOUCHY = "touchy";
+	public static final String totalHeight = "totalheight";
+	public static final String totalWidth = "totalwidth";
+	
+	// Tells the receiver if the 'Clear' button was pressed.
+	public static boolean clearButton = false; 
+	// Tells the receiver if the 'Change Background' button was pressed.
+	public static boolean changeBGButton = false; 
 	// ------------------------------------------------
-	
-	// I am assuming that this class remains alive for the duration of the live wallpapers lifecycle.
-	// I am storing the height/width values into it so that, in the preview, the user can choose where
-	// to place the image, and the once the preview dies and the real wallpaper is being set, the values chosen
-	// in the preview remain and gets placed there. 
-	static float Totalwidth = 0;
-	static float Totalheight = 0;
-	static float Measuredwidth = 0;
-	static float Measuredheight = 0;
 
-	static public void setWidth(float x){
-		Measuredwidth = x;
-	}
-	static public void setHeight(float y){
-		Measuredheight = y;
-	}
-	static public float getWidth(){
-		return Measuredwidth;
-	}
-	static public float getHeight(){
-		return Measuredheight;
-	}
-	
-	static public void setTotalWidth(float x){
-		Totalwidth = x;
-	}
-	static public void setTotalHeight(float y){
-		Totalheight = y;
-	}
-	static public float getTotalWidth(){
-		return Totalwidth;
-	}
-	static public float getTotalHeight(){
-		return Totalheight;
-	}
-	
 	@SuppressWarnings({ "deprecation", "unused" })
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {		
+		SharedPreferences defPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
+		SharedPreferences.Editor prefsEditor = defPrefs.edit();
 		// ------------------------------------
 		// Find the size of the screen here. Allow for both before and after android version 13  by using
-		// Deprecated functions. 
-		Point size = new Point();
-		WindowManager w = getWindowManager();
-	    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2){
-	      w.getDefaultDisplay().getSize(size);
-
-          setWidth(size.x/2);
-          setHeight(size.y/2);
-          setTotalWidth(size.x);
-          setTotalHeight(size.y);
-        }else{
-          Display d = w.getDefaultDisplay(); 
-          setWidth(d.getWidth()/2); 
-          setHeight(d.getHeight()/2); 
-          setTotalWidth(d.getWidth());
-          setTotalHeight(d.getHeight());
-        }		
-		// ------------------------------------
-	    
-	    // If the location of the animation was created earlier, preserve it. 
-	    SharedPreferences prefs = getApplicationContext().getSharedPreferences("location", 0);
-		if(prefs.contains(X) && prefs.contains(Y)){
-			setWidth( prefs.getFloat(X,0) );
-			setHeight( prefs.getFloat(Y,0) );
+		// Deprecated functions. Do not change location in prefs if there is a stored value already. 
+		Float currentX = defPrefs.getFloat(X,-1);
+		Float currentY = defPrefs.getFloat(Y,-1);
+		
+		if(currentX == -1 && currentY == -1){
+			Point size = new Point();
+			WindowManager w = getWindowManager();
+		    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2){
+		      w.getDefaultDisplay().getSize(size);
+		      
+		      float x = size.x;
+		      float y = size.y;
+		      prefsEditor.putFloat(X, size.x/2);
+		      prefsEditor.putFloat(Y, size.y/2);
+		      prefsEditor.putFloat(totalWidth, size.x);
+		      prefsEditor.putFloat(totalHeight, size.y);
+		      prefsEditor.commit();
+		      
+	        }else{
+	          Display d = w.getDefaultDisplay(); 
+	          
+	          float x = d.getWidth();
+		      float y = d.getHeight();
+	          prefsEditor.putFloat(X, d.getWidth()/2);
+		      prefsEditor.putFloat(Y, d.getHeight()/2);
+		      prefsEditor.putFloat(totalWidth, d.getWidth());
+		      prefsEditor.putFloat(totalHeight, d.getHeight());
+		      prefsEditor.commit();
+	        }	
 		}
+		// ------------------------------------
 		
 		// Set the main layout, and create the grid view for the animations. 
 		setContentView(R.layout.main); 
@@ -115,14 +95,24 @@ public class StartLolpaperActivity extends Activity {
 	}
 	
 	public void onSetBGClick(View view){
+		// Call garbage collector to avoid running out of memory!
+		// Constant loading and changing of backgrounds will cause out of memory issues 
+		// since it is happening too fast for the garbage collector to handle it.
+		// Call the GB manually in order to avoid these types of errors. 
+		System.gc();
+				
 		// Use startActivityForResult() to notify onActivityResult when the intent is complete
+		StartLolpaperActivity.changeBGButton = true;
+		
 		Intent BGintent = new Intent();
 		BGintent.setAction(Intent.ACTION_SET_WALLPAPER);
-		startActivityForResult(BGintent,SET_WALLPAPER);
+		//startActivityForResult(BGintent,SET_WALLPAPER);
+		startActivity(BGintent);
 	}
 	
 	public void onClearClick(View view){
 		WallpaperManager wallpaperManager = WallpaperManager.getInstance(getApplicationContext());
+		StartLolpaperActivity.clearButton = true;
 		// HACK!!--!!--!! THIS MAY NOT WORK ON ALL DEVICES OR VERSIONS
 		// Create an empty byte output stream, put it into an input stream, then use that to setStream()
 		// For whatever reason, this resets the wallpaper to exactly how it should be, and fast.
