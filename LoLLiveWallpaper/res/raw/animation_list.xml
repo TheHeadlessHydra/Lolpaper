@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+FORMAT ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+<animations>
+<base>
+	<idles>
+		<idle_main>...</idle_main>
+		<idle>...</idle>
+		...
+	</idles>
+	<out_transitions>
+	            <out_transition>...</out_transition>
+	            ...
+	</out_transitions>
+</base>
+<keys> 
+ 	...
+	<key>
+		<idles>
+			<idle_main>...</idle_main>
+			<idle>...</idle>
+			...
+		</idles>
+		<out_transitions>
+	            <out_transition>...</out_transition>
+	            ...
+	    </out_transitions>
+	</key>
+	...
+</keys>
+
+</animations>
+
+ATTRIBUTES ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<key> attributes:
+name: 			full name of animation
+
+<idle_main> and <idle> attributes:
+name:			full name of animation
+frames:			number of frames for animation
+
+<out_transition> attributes:
+name: 			full name of animation
+frames:			number of frames for animation
+to:				full name of key or 'base' for where this transition will take the animation
+
+ -->
+<animations>
+    <base>
+        <idle_main name="base_idle_main"
+	               frames="11"></idle_main>
+        <idles>
+	        <idle name="base_idle_01"
+	              frames="14"></idle>
+        </idles>
+        <out_transitions>
+            <out_transition name="base_key_sit"
+                        	frames="19"
+                        	to="key_sit"></out_transition>
+        </out_transitions>
+    </base>
+    <keys>
+	    <key name="key_sit">
+	        <out_transitions>
+	            <out_transition name="key_sit_key_sleep"
+	                            frames="23"
+	                	    	to="key_sleep"></out_transition>
+	        </out_transitions>
+	    </key>
+	    
+	    <key name="key_sleep">
+	        <idle_main name="key_sleep_idle_main"
+		               frames="17"></idle_main>
+	    </key>
+    </keys>
+   
+</animations>

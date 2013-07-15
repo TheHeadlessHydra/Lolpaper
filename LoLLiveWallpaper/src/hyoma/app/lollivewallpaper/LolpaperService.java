@@ -79,9 +79,10 @@ public class LolpaperService extends WallpaperService {
 		// Get the next animation in the frame.
 		private void nextFrame(){
 			// *****************************************************************************************************
-			String nameOfFrame = "chibimord_frame" + animationCount; // HARD CODED STRING - NEEDS TO BE STANDARDIZED
+			//String nameOfFrame = "chibimord_frame" + animationCount; // HARD CODED STRING - NEEDS TO BE STANDARDIZED
+			String nameOfFrame = "key_base_sleep" + animationCount; // HARD CODED STRING - NEEDS TO BE STANDARDIZED
 			animationCount++;
-			if(animationCount > 39){
+			if(animationCount > 0){
 				animationCount = 0;
 			}
 			int identifier = 0;
@@ -147,12 +148,17 @@ public class LolpaperService extends WallpaperService {
 			float fYSize = animFrame.getHeight();
 			float fPositionX = fTouchX - (fXSize/2);
 			float fPositionY = fTouchY - (fYSize/2);
+			float endOfImageX = fTouchX + fXSize/2;
+			float endOfImageY = fTouchY + fYSize/2;
 			
 			// Allow touch events to occur only if it is enabled in the prefs and is in preview mode, 
 			// and the touch event is in the right area.
-			if (	fPositionY < (fTotalHeight - fTotalHeight/6) && // Do not go too low, so as not to touch the buttons at the bottom
-					fPositionY > 0                 			  && // Do not go too high, or cut off top of image
-					fPositionX < (fTotalWidth - fTotalWidth/6)   && // Do not go too far right, or cut off image
+			if (	fPositionX > 0 && // Too far left
+					fPositionY > 0 && // Too far up
+					endOfImageX < fTotalWidth && // Too far right
+					endOfImageY < fTotalHeight && // Too far down
+					fTouchY < (fTotalHeight - fTotalHeight/6) && // Do not go too low, so as not to touch the buttons at the bottom
+					//endOfImageX < (fTotalWidth - fTotalWidth/6)   && // Do not go too far right, or cut off image
 					touchEnabled && this.isPreview()) {
 
 				// Set the position of the touch in the static holders
