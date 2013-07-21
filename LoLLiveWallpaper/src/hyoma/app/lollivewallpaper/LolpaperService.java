@@ -10,6 +10,8 @@ package hyoma.app.lollivewallpaper;
 
 
 
+import java.io.IOException;
+
 import android.app.WallpaperManager;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -23,15 +25,26 @@ import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import hyoma.app.lollivewallpaper.AnimationSystem.Idle;
+import hyoma.app.lollivewallpaper.AnimationSystem.Key;
 import hyoma.app.lollivewallpaper.StartLolpaperActivity;
+import hyoma.app.lollivewallpaper.AnimationSystem;
 
 public class LolpaperService extends WallpaperService {
 	Bitmap wallpaperBG; // Holds current bg wallpaper
 	WallpaperManager wallpaperManager; // Holds current wallpaper manager
 	Drawable wallpaperDrawable; // holds current wallpaper drawable 
+	AnimationSystem anim;
 	
 	@Override
 	public Engine onCreateEngine() {
+		try {
+			anim = new AnimationSystem(getApplicationContext());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		anim.initiate();
 		// Call garbage collector to avoid running out of memory!
 		// Constant loading and changing of backgrounds will cause out of memory issues 
 		// since it is happening too fast for the garbage collector to handle it.
@@ -73,14 +86,32 @@ public class LolpaperService extends WallpaperService {
 		public LolpaperEngine() {
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LolpaperService.this);
 			updateTimer = Integer.parseInt(prefs.getString("updatetimer", "20"));
-			handler.post(drawRunner);			
+			handler.post(drawRunner);
 		}
 
 		// Get the next animation in the frame.
 		private void nextFrame(){
 			// *****************************************************************************************************
 			//String nameOfFrame = "chibimord_frame" + animationCount; // HARD CODED STRING - NEEDS TO BE STANDARDIZED
-			String nameOfFrame = "key_base_sleep" + animationCount; // HARD CODED STRING - NEEDS TO BE STANDARDIZED
+			//String nameOfFrame = "key_sit_key_sleep_" + animationCount; // HARD CODED STRING - NEEDS TO BE STANDARDIZED
+			anim.nextFrame();
+			Key base = anim.getBase();
+			if (base == null){
+				String errorMsg = "ERROR: base is null";
+				throw new Error(errorMsg);
+			}
+			Idle main = base.idleMain;
+			if (main == null){
+				String errorMsg = "ERROR: idle main is null";
+				throw new Error(errorMsg);
+			}
+			String name = main.name;
+			if (name == null){
+				String errorMsg = "ERROR: name is null";
+				throw new Error(errorMsg);
+			}
+				
+			String nameOfFrame = anim.getBase().idleMain.name + "_" + animationCount;
 			animationCount++;
 			if(animationCount > 0){
 				animationCount = 0;
@@ -115,6 +146,7 @@ public class LolpaperService extends WallpaperService {
 			super.onSurfaceDestroyed(holder);
 			this.visible = false;
 			handler.removeCallbacks(drawRunner);
+			anim.cleanRunnables();
 		}
 
 		// Called immediately after any structural change. Always called at least once after creation.

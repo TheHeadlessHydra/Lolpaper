@@ -2,7 +2,7 @@
 //***************************
 /*
 	Parser that will take the animation_list.xml file in res/xml and parse it to
-	create a final AnimationSystem.
+	create a final AnimationSystem with appropriately created Base and Keys. 
 */
 //***************************
 // *****************************************************************************
@@ -56,9 +56,11 @@ public class AnimationListXMLParser {
 	            String name = parser.getName();
 	            // Starts by looking for the entry tag
 	            if (name.equals("base")) {
+	            	System.out.println ("IN <base>");
 	            	if(base != null){throw new IOException("Cannot have more than one base");}
 	            	base = readBase(parser);
 	            } else if (name.equals("keys")) {
+	            	System.out.println ("IN <keys>");
 	            	keyList = readKeys(parser);
 	            } else {
 	                skip(parser);
@@ -66,6 +68,10 @@ public class AnimationListXMLParser {
 	        }
 	        
 	        // Create the animation system and return it
+	        if (base == null){
+	        	String errorMsg = "ERROR: Must have at least one base";
+				throw new Error(errorMsg);
+	        }
 	        this.anim.createAnimationSystem(base, keyList);
 	    }
 
@@ -81,12 +87,15 @@ public class AnimationListXMLParser {
 	                continue;
 	            }
 	            String parseName = parser.getName();
-	            if (parseName.equals("idle")) {
+	            if (parseName.equals("idle_main")) {
+	            	System.out.println ("IN <idle> main");
 	            	if(idleMain != null){throw new IOException("Cannot have more than one main idle state");}
 	            	idleMain = readIdleMain(parser);
 	            } else if (parseName.equals("idles")) {
+	            	System.out.println ("IN <idles>");
 	            	idleList = readIdles(parser);
 	            } else if (parseName.equals("out_transitions")) {
+	            	System.out.println ("IN <out_transitions>");
 	            	outTransitionList = readOutTransitions(parser);
 	            } else {
 	                skip(parser);
@@ -185,21 +194,46 @@ public class AnimationListXMLParser {
 	    }
 	    
 	    // END TAG FUNCTIONS ----------------------------------------------------------------------------------
-	    // Processes'<idle>' tag
-	    private AnimationSystem.Idle readIdle(XmlPullParser parser) throws IOException, XmlPullParserException {
-	        parser.require(XmlPullParser.START_TAG, ns, "idle");
-	        String name = parser.getAttributeValue(null, "name");
-	        String frames = parser.getAttributeValue(null, "frames");
-	        parser.require(XmlPullParser.END_TAG, ns, "idle");
-	        
-	        return new AnimationSystem.Idle(name,Integer.parseInt(frames));
-	    }
 	    // Processes '<idle_main>' tag
 	    private AnimationSystem.Idle readIdleMain(XmlPullParser parser) throws IOException, XmlPullParserException {
 	        parser.require(XmlPullParser.START_TAG, ns, "idle_main");
 	        String name = parser.getAttributeValue(null, "name");
+	        System.out.println ("idle_main name: "+name);
 	        String frames = parser.getAttributeValue(null, "frames");
+	        System.out.println ("idle_main frames: "+frames);
+	        // Parse next tags
+	        int next = parser.next();
+	        if (next == XmlPullParser.TEXT){
+	        	System.err.println ("WARNING: No text required in <idle_main> tag. Skipping.");
+	        	next = parser.next();
+	        }
+	        if (next != XmlPullParser.END_TAG){
+	        	String errorMsg = "ERROR: Failure to parse XML. Are you sure you're following the correct format?";
+	        	errorMsg += "\nParse format met...: "+next+".  Expected: "+XmlPullParser.END_TAG+", the end tag.";
+				throw new Error(errorMsg);
+	        }
 	        parser.require(XmlPullParser.END_TAG, ns, "idle_main");
+	        return new AnimationSystem.Idle(name,Integer.parseInt(frames));
+	    }
+	 // Processes'<idle>' tag
+	    private AnimationSystem.Idle readIdle(XmlPullParser parser) throws IOException, XmlPullParserException {
+	        parser.require(XmlPullParser.START_TAG, ns, "idle");
+	        String name = parser.getAttributeValue(null, "name");
+	        System.out.println ("idle name: "+name);
+	        String frames = parser.getAttributeValue(null, "frames");
+	        System.out.println ("idle frames: "+frames);
+	        // Parse next tags
+	        int next = parser.next();
+	        if (next == XmlPullParser.TEXT){
+	        	System.err.println ("WARNING: No text required in <idle> tag. Skipping.");
+	        	next = parser.next();
+	        }
+	        if (next != XmlPullParser.END_TAG){
+	        	String errorMsg = "ERROR: Failure to parse XML. Are you sure you're following the correct format?";
+	        	errorMsg += "\nParse format met...: "+next+".  Expected: "+XmlPullParser.END_TAG+", the end tag.";
+				throw new Error(errorMsg);
+	        }
+	        parser.require(XmlPullParser.END_TAG, ns, "idle");
 	        
 	        return new AnimationSystem.Idle(name,Integer.parseInt(frames));
 	    }
@@ -207,8 +241,21 @@ public class AnimationListXMLParser {
 	    private AnimationSystem.OutTransition readOutTransition(XmlPullParser parser) throws IOException, XmlPullParserException {
 	        parser.require(XmlPullParser.START_TAG, ns, "out_transition");
 	        String name = parser.getAttributeValue(null, "name");
+	        System.out.println ("out_transition name: "+name);
 	        String frames = parser.getAttributeValue(null, "frames");
+	        System.out.println ("out_transition frames: "+frames);
 	        String to = parser.getAttributeValue(null, "to");
+	        // Parse next tags
+	        int next = parser.next();
+	        if (next == XmlPullParser.TEXT){
+	        	System.err.println ("WARNING: No text required in <idle> tag. Skipping.");
+	        	next = parser.next();
+	        }
+	        if (next != XmlPullParser.END_TAG){
+	        	String errorMsg = "ERROR: Failure to parse XML. Are you sure you're following the correct format?";
+	        	errorMsg += "\nParse format met...: "+next+".  Expected: "+XmlPullParser.END_TAG+", the end tag.";
+				throw new Error(errorMsg);
+	        }
 	        parser.require(XmlPullParser.END_TAG, ns, "out_transition");
 	        
 	        return new AnimationSystem.OutTransition(name,Integer.parseInt(frames),to);
