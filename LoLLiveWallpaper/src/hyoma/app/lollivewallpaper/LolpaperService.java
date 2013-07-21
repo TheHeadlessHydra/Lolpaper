@@ -146,7 +146,7 @@ public class LolpaperService extends WallpaperService {
 			super.onSurfaceDestroyed(holder);
 			this.visible = false;
 			handler.removeCallbacks(drawRunner);
-			anim.cleanRunnables();
+			anim.cleanExecutor();
 		}
 
 		// Called immediately after any structural change. Always called at least once after creation.

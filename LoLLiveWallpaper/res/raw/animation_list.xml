@@ -63,6 +63,9 @@ to:				full name of key or 'base' for where this transition will take the animat
     </base>
     <keys>
 	    <key name="key_sit">
+	        <idle_main name="key_sit_idle_main"
+	               	   frames="1">
+        	</idle_main>
 	        <out_transitions>
 	            <out_transition name="key_sit_key_sleep"
 	                            frames="23"
