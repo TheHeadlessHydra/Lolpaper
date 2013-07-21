@@ -22,13 +22,13 @@
                 android:key="actionrate"
                 android:title="Action Rate"
                 android:summary="Control how often an action will play, in seconds"
-                android:defaultValue="120" 
+                android:defaultValue="10" 
                 android:inputType="number"/>
     <EditTextPreference
                 android:key="idlerate"
                 android:title="Idle Rate"
                 android:summary="Control how often an idle animation will play, in seconds"
-                android:defaultValue="60" 
+                android:defaultValue="5" 
                 android:inputType="number"/>
      </PreferenceCategory>
 

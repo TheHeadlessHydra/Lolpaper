@@ -88,7 +88,7 @@ public class AnimationListXMLParser {
 	            }
 	            String parseName = parser.getName();
 	            if (parseName.equals("idle_main")) {
-	            	System.out.println ("IN <idle> main");
+	            	System.out.println ("IN <idle_main>");
 	            	if(idleMain != null){throw new IOException("Cannot have more than one main idle state");}
 	            	idleMain = readIdleMain(parser);
 	            } else if (parseName.equals("idles")) {
@@ -101,6 +101,7 @@ public class AnimationListXMLParser {
 	                skip(parser);
 	            }
 	        }
+	        if(idleMain == null){throw new IOException("ERROR: Must have an <idle_main> for each key and the base!");}
 	        return new AnimationSystem.KeyBuilder().name("base")
 	        									   .idleMain(idleMain)
 	        									   .idleList(idleList)
@@ -139,7 +140,9 @@ public class AnimationListXMLParser {
 	                continue;
 	            }
 	            String parseName = parser.getName();
-	            if (parseName.equals("idle")) {
+	            if (parseName.equals("idle_main")) {
+	            	System.out.println ("IN <idle_main>");
+	            	if(idleMain != null){throw new IOException("ERROR: Cannot have more than one main idle state");}
 	            	idleMain = readIdleMain(parser);
 	            } else if (parseName.equals("idles")) {
 	            	idleList = readIdles(parser);
@@ -149,6 +152,8 @@ public class AnimationListXMLParser {
 	                skip(parser);
 	            }
 	        }
+	        
+	        if(idleMain == null){throw new IOException("ERROR: Must have an <idle_main> for each key and the base!");}
 	        return new AnimationSystem.KeyBuilder().name(name)
 	        									   .idleMain(idleMain)
 	        									   .idleList(idleList)

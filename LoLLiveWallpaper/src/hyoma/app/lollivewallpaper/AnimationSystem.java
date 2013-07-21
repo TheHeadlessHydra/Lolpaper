@@ -116,6 +116,15 @@ public class AnimationSystem {
 				this.idleMain = idleMain;
 				this.idleList = idleList;
 				this.outTransitionList = outTransitionList;
+				
+				// Instantiate to empty lists if null
+				if(this.idleList == null)
+					this.idleList = new ArrayList<Idle>();
+				if(this.outTransitionList == null)
+					this.outTransitionList = new ArrayList<OutTransition>();
+				if(this.idleMain == null){
+					System.err.println ("ERROR: Key being made with no idle_main!");
+				}
 			}		
 			public void setMainIdle(Idle transition){
 				this.idleMain = transition;
@@ -241,8 +250,8 @@ public class AnimationSystem {
 	public void initiate(){
 		// Update rates based on pref values
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currentCtx);
-		actionrate = Integer.parseInt(prefs.getString("actionrate", "120"));
-		idlerate = Integer.parseInt(prefs.getString("idlerate", "60"));
+		actionrate = Integer.parseInt(prefs.getString("actionrate", "10"));
+		idlerate = Integer.parseInt(prefs.getString("idlerate", "5"));
 		
 		// Set the current key to base and set the current frame
 		setKey(base);
@@ -271,14 +280,13 @@ public class AnimationSystem {
 		else if (updateIdle && isEndFrame && !inTransition && !inIdle)
 			startNewIdle();
 		// End of transition animation
-		if(isEndFrame && inTransition)
+		else if(isEndFrame && inTransition)
 			endNewAction();
 		// End of secondary idle sequence
-		if(isEndFrame && !inTransition && inIdle)
-			endNewIdle();
-		
+		else if(isEndFrame && !inTransition && inIdle)
+			endNewIdle();	
 		// End of main idle animation. Loop.
-		if(isEndFrame && !inTransition && !inIdle)
+		else if(isEndFrame && !inTransition && !inIdle)
 			currentFrameNumber = 0;
 		
 		setFrame();
@@ -322,7 +330,6 @@ public class AnimationSystem {
 	}
 	// Set currentTransition and update relevant information
 	private void setTrans(OutTransition trans){
-		currentKey = null;
 		currentFrameNumber = 0;
 		maxFrameNumber = trans.getMaxFrame();
 		inIdle = false;
@@ -332,7 +339,6 @@ public class AnimationSystem {
 	}
 	// Set currentIdle and update relevant information
 	private void setIdle(Idle idle){
-		currentKey = null;
 		currentFrameNumber = 0;
 		maxFrameNumber = idle.getMaxFrame();
 		inIdle = true;
@@ -364,7 +370,7 @@ public class AnimationSystem {
 	// Begin the transition sequence, or reset to base if no transition found.
 	// Kills all remaining idle and action threads.
 	private void startNewAction(){
-		cleanExecutor();
+		resetExecutor();
 					
 		OutTransition trans = currentKey.chooseRandomTransiton();
 		if (trans == null){

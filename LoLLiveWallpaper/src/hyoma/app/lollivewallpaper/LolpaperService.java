@@ -16,7 +16,6 @@ import android.app.WallpaperManager;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -25,19 +24,18 @@ import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import hyoma.app.lollivewallpaper.AnimationSystem.Idle;
-import hyoma.app.lollivewallpaper.AnimationSystem.Key;
 import hyoma.app.lollivewallpaper.StartLolpaperActivity;
 import hyoma.app.lollivewallpaper.AnimationSystem;
 
 public class LolpaperService extends WallpaperService {
-	Bitmap wallpaperBG; // Holds current bg wallpaper
-	WallpaperManager wallpaperManager; // Holds current wallpaper manager
-	Drawable wallpaperDrawable; // holds current wallpaper drawable 
-	AnimationSystem anim;
+	Bitmap wallpaperBG; 				// Holds current bg wallpaper
+	WallpaperManager wallpaperManager; 	// Holds current wallpaper manager
+	Drawable wallpaperDrawable; 		// holds current wallpaper drawable 
+	AnimationSystem anim;				// Holds the main Animation System
 	
 	@Override
 	public Engine onCreateEngine() {
+		// Create the animation system and initiate it
 		try {
 			anim = new AnimationSystem(getApplicationContext());
 		} catch (IOException e) {
@@ -45,6 +43,7 @@ public class LolpaperService extends WallpaperService {
 			e.printStackTrace();
 		}
 		anim.initiate();
+		
 		// Call garbage collector to avoid running out of memory!
 		// Constant loading and changing of backgrounds will cause out of memory issues 
 		// since it is happening too fast for the garbage collector to handle it.
@@ -80,7 +79,6 @@ public class LolpaperService extends WallpaperService {
 		};
 		private boolean visible = true;
 		private boolean touchEnabled;
-		private int animationCount = 0;
 		Bitmap animFrame;
 
 		public LolpaperEngine() {
@@ -91,38 +89,7 @@ public class LolpaperService extends WallpaperService {
 
 		// Get the next animation in the frame.
 		private void nextFrame(){
-			// *****************************************************************************************************
-			//String nameOfFrame = "chibimord_frame" + animationCount; // HARD CODED STRING - NEEDS TO BE STANDARDIZED
-			//String nameOfFrame = "key_sit_key_sleep_" + animationCount; // HARD CODED STRING - NEEDS TO BE STANDARDIZED
-			anim.nextFrame();
-			Key base = anim.getBase();
-			if (base == null){
-				String errorMsg = "ERROR: base is null";
-				throw new Error(errorMsg);
-			}
-			Idle main = base.idleMain;
-			if (main == null){
-				String errorMsg = "ERROR: idle main is null";
-				throw new Error(errorMsg);
-			}
-			String name = main.name;
-			if (name == null){
-				String errorMsg = "ERROR: name is null";
-				throw new Error(errorMsg);
-			}
-				
-			String nameOfFrame = anim.getBase().idleMain.name + "_" + animationCount;
-			animationCount++;
-			if(animationCount > 0){
-				animationCount = 0;
-			}
-			int identifier = 0;
-			identifier = getResources().getIdentifier(nameOfFrame,"drawable", "hyoma.app.lollivewallpaper");
-			if (identifier == 0){
-				String errorMsg = "ERROR: Animation frames missing or corrupted";
-				throw new Error(errorMsg);
-			}
-			animFrame = BitmapFactory.decodeResource(getResources(), identifier);
+			animFrame = anim.nextFrame();
 		}
 		
 		// Called to inform you of the wallpaper becoming visible or hidden. 
