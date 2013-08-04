@@ -18,8 +18,7 @@ import android.widget.ImageView;
 public class AnimationsImageAdapter extends BaseAdapter {
 	// references to our images
     private Integer[] mThumbIds = {
-            R.drawable.chibimord_frame0, R.drawable.chibimord_frame0,
-            R.drawable.chibimord_frame0
+            R.drawable.chibimord_frame_0, R.drawable.base_idle_main_0
     };
     private Context mContext;
 
